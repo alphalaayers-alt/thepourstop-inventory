@@ -37,7 +37,7 @@ export function LoginForm() {
           <Input
             label="Email"
             type="email"
-            placeholder="admin@pourstop.com"
+            placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -57,13 +57,6 @@ export function LoginForm() {
             Sign in
           </Button>
         </form>
-
-        <div className="mt-6 rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4 py-3">
-          <p className="text-xs font-medium text-slate-500">Default super admin</p>
-          <p className="mt-1 text-sm text-slate-700">
-            admin@pourstop.com / admin123
-          </p>
-        </div>
       </CardContent>
     </Card>
   );
