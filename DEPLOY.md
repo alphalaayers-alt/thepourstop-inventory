@@ -1,54 +1,61 @@
-# Deploy The Pour Stop — Supabase + Vercel
+# Deploy The Pour Stop — Local vs Production
 
-Complete checklist. Do steps **in order**.
+## How data storage works
+
+| Environment | Where data is saved |
+|-------------|---------------------|
+| **Local** (`npm run dev`) | Browser **localStorage** (same as before) |
+| **Production** (Vercel) | **Supabase** database (shared for all users) |
+
+The app switches automatically:
+- `NODE_ENV=development` → local browser storage
+- `NODE_ENV=production` + Supabase env vars → cloud database
+
+You do **not** need Supabase keys in `.env.local` for local dev unless you want to test production mode locally.
 
 ---
 
-## PART A — Supabase (database)
+## PART A — Supabase (production database)
 
 ### A1. Create project
-1. [supabase.com/dashboard](https://supabase.com/dashboard) → **New project**
-2. Name, database password, region → wait until **Active**
+[supabase.com/dashboard](https://supabase.com/dashboard) → **New project**
 
 ### A2. Copy API keys
 **Project Settings** → **Configuration** → **API Keys**
 
-| Copy from Supabase | Environment variable |
-|--------------------|----------------------|
+| Supabase | Environment variable |
+|----------|----------------------|
 | Project URL | `NEXT_PUBLIC_SUPABASE_URL` |
-| Publishable key `sb_publishable_...` (or legacy `anon` key) | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
-| Secret key `sb_secret_...` (or legacy `service_role` key) | `SUPABASE_SERVICE_ROLE_KEY` |
+| Publishable `sb_publishable_...` | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+| Secret `sb_secret_...` | `SUPABASE_SERVICE_ROLE_KEY` |
 
-### A3. Local `.env.local`
-```powershell
-copy env.local.template .env.local
-```
-Fill in the three values. Restart: `npm run dev`
-
-### A4. Run database SQL
-1. Supabase → **SQL Editor** → **New query**
-2. Paste all of `supabase/schema.sql` → **Run**
-
-### A5. Create super admin
-1. **Authentication** → **Users** → **Add user**
-2. Email: `admin@pourstop.com`, password, **Auto Confirm: ON**
-3. SQL Editor → run `supabase/seed-super-admin.sql`
-
-### A6. Test locally
-Open [http://localhost:3000/setup](http://localhost:3000/setup) — all tables should be **OK**.
+### A3. Run SQL
+1. **SQL Editor** → paste `supabase/schema.sql` → **Run**
+2. **Authentication** → **Users** → create `admin@pourstop.com` (Auto Confirm ON)
+3. **SQL Editor** → run `supabase/seed-super-admin.sql`
 
 ---
 
-## PART B — GitHub (code)
+## PART B — Local development (optional Supabase)
 
-### B1. Create repo
-GitHub → **New repository** → name e.g. `inventorythepourstop`
+For normal local work, **no `.env.local` needed** — data stays in the browser.
 
-### B2. Push code
+Optional: create `.env.local` only if you want to test `/setup` locally.
+
 ```powershell
-cd "C:\Users\soura\Desktop\Oscenox Info\oscenoxprojects\inventorythepourstop"
+copy env.local.template .env.local
+npm run dev
+```
+
+Login locally: `admin@pourstop.com` / `admin123` (browser storage)
+
+---
+
+## PART C — GitHub
+
+```powershell
 git add .
-git commit -m "Prepare for Supabase and Vercel deployment"
+git commit -m "Add Supabase production mode and Vercel deploy"
 git branch -M main
 git remote add origin https://github.com/YOUR_USERNAME/inventorythepourstop.git
 git push -u origin main
@@ -56,49 +63,45 @@ git push -u origin main
 
 ---
 
-## PART C — Vercel (hosting)
+## PART D — Vercel (production)
 
-### C1. Import project
-1. [vercel.com](https://vercel.com) → **Add New** → **Project**
-2. Import your GitHub repo
-3. Framework: **Next.js** (auto)
+### D1. Import repo
+[vercel.com](https://vercel.com) → **Add New** → **Project** → import GitHub repo
 
-### C2. Environment variables (before first deploy)
-**Settings** → **Environment Variables** — add for Production, Preview, Development:
+### D2. Environment variables (required for production)
+Add all three for **Production**:
 
-| Name | Value |
-|------|--------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your publishable / anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Your secret / service_role key |
+```
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+```
 
-### C3. Deploy
-Click **Deploy**. Your site will be at `https://your-project.vercel.app`
+Without these, production would fall back to browser storage (not suitable for a live bar).
 
-### C4. Test live setup page
-`https://your-project.vercel.app/setup` — should match local `/setup` results.
+### D3. Deploy
+Click **Deploy** → open `https://your-app.vercel.app`
 
-### C5. Custom domain (optional)
-Vercel → **Settings** → **Domains** → add your domain.
+### D4. Login on production
+Use the **Supabase Auth** password you set for `admin@pourstop.com` (not necessarily `admin123`).
 
----
-
-## PART D — Important: what works today
-
-| Feature | Status |
-|---------|--------|
-| Site hosted on Vercel | ✅ After Part C |
-| Supabase database created | ✅ After Part A |
-| Connection test `/setup` | ✅ |
-| Login, inventory, sales in cloud | ⏳ Needs code migration |
-
-The app still uses **browser localStorage** for daily operations until we wire each module to Supabase. Deploying now puts the site online; **shared live data** needs the migration phase.
-
-**Next:** Ask in chat: *"Continue Supabase migration"* to connect login, inventory, orders, and sales to the database.
+### D5. Verify
+- `https://your-app.vercel.app/setup` → database connected
+- `https://your-app.vercel.app/login` → super admin login works
+- Add inventory on production → check **Supabase** → **Table Editor** → `menu_items`
 
 ---
 
-## Security checklist
-- [ ] Never commit `.env.local` or paste secret keys in chat
-- [ ] Change `admin123` password after going live
-- [ ] `SUPABASE_SERVICE_ROLE_KEY` only in Vercel server env (not `NEXT_PUBLIC_*`)
+## Summary
+
+```
+Local dev     →  localStorage  →  admin@pourstop.com / admin123
+Vercel live   →  Supabase      →  admin@pourstop.com / (your Supabase password)
+```
+
+---
+
+## Security
+- Never commit `.env.local`
+- Never put `SUPABASE_SERVICE_ROLE_KEY` in `NEXT_PUBLIC_*`
+- Change default passwords before going live

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createManager } from "@/lib/auth";
+import { createManagerCloud } from "@/lib/cloud/admin-managers";
+import { useAuth } from "@/contexts/AuthContext";
 import { DEFAULT_MANAGER_PERMISSIONS } from "@/lib/permissions";
 import type { ManagerPermissions } from "@/types/auth";
 import { showError, showSuccess } from "@/lib/toast";
@@ -13,6 +15,7 @@ import { ManagerPermissionsEditor } from "./ManagerPermissionsEditor";
 
 export function CreateManagerForm() {
   const router = useRouter();
+  const { isCloudMode } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,7 +25,7 @@ export function CreateManagerForm() {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -31,7 +34,9 @@ export function CreateManagerForm() {
     }
 
     setIsLoading(true);
-    const result = createManager({ name, email, password, permissions });
+    const result = isCloudMode
+      ? await createManagerCloud({ name, email, password, permissions })
+      : createManager({ name, email, password, permissions });
 
     if (result.success) {
       showSuccess("Manager created", `${name.trim()} can now sign in.`);

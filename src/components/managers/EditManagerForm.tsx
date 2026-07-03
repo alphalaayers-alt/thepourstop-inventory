@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateManager } from "@/lib/auth";
+import { updateManagerCloud } from "@/lib/cloud/admin-managers";
+import { useAuth } from "@/contexts/AuthContext";
 import { normalizeManagerPermissions } from "@/lib/permissions";
 import type { ManagerPermissions, User } from "@/types/auth";
 import { showError, showSuccess } from "@/lib/toast";
@@ -17,6 +19,7 @@ interface EditManagerFormProps {
 
 export function EditManagerForm({ manager }: EditManagerFormProps) {
   const router = useRouter();
+  const { isCloudMode } = useAuth();
   const [name, setName] = useState(manager.name);
   const [email, setEmail] = useState(manager.email);
   const [password, setPassword] = useState("");
@@ -26,7 +29,7 @@ export function EditManagerForm({ manager }: EditManagerFormProps) {
   );
   const [isLoading, setIsLoading] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     if (password && password !== confirmPassword) {
@@ -35,12 +38,15 @@ export function EditManagerForm({ manager }: EditManagerFormProps) {
     }
 
     setIsLoading(true);
-    const result = updateManager(manager.id, {
+    const payload = {
       name,
       email,
       password: password || undefined,
       permissions,
-    });
+    };
+    const result = isCloudMode
+      ? await updateManagerCloud(manager.id, payload)
+      : updateManager(manager.id, payload);
 
     if (result.success) {
       showSuccess("Manager updated", `${name.trim()}'s account was saved.`);

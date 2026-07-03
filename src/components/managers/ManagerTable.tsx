@@ -3,6 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getManagers, toggleManagerStatus, deleteManager } from "@/lib/auth";
+import {
+  deleteManagerCloud,
+  toggleManagerStatusCloud,
+} from "@/lib/cloud/admin-managers";
+import { useAuth } from "@/contexts/AuthContext";
 import { countEnabledPermissions, normalizeManagerPermissions } from "@/lib/permissions";
 import type { User } from "@/types/auth";
 import { confirmAction, showError, showSuccess } from "@/lib/toast";
@@ -19,6 +24,7 @@ function formatDate(iso: string) {
 }
 
 export function ManagersTable() {
+  const { isCloudMode } = useAuth();
   const [managers, setManagers] = useState<User[]>([]);
 
   function loadManagers() {
@@ -29,13 +35,18 @@ export function ManagersTable() {
     loadManagers();
   }, []);
 
-  function handleToggle(id: string, name: string, isActive: boolean) {
-    toggleManagerStatus(id);
+  async function handleToggle(id: string, name: string, isActive: boolean) {
+    if (isCloudMode) {
+      const result = await toggleManagerStatusCloud(id, isActive);
+      if (!result.success) {
+        showError("Could not update manager", result.error);
+        return;
+      }
+    } else {
+      toggleManagerStatus(id);
+    }
     loadManagers();
-    showSuccess(
-      isActive ? "Manager deactivated" : "Manager activated",
-      name
-    );
+    showSuccess(isActive ? "Manager deactivated" : "Manager activated", name);
   }
 
   async function handleDelete(id: string, name: string) {
@@ -45,7 +56,16 @@ export function ManagersTable() {
       confirmText: "Yes, delete",
     });
     if (!confirmed) return;
-    deleteManager(id);
+
+    if (isCloudMode) {
+      const result = await deleteManagerCloud(id);
+      if (!result.success) {
+        showError("Could not delete manager", result.error);
+        return;
+      }
+    } else {
+      deleteManager(id);
+    }
     loadManagers();
     showSuccess("Manager deleted", `"${name}" was removed.`);
   }
