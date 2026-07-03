@@ -79,7 +79,16 @@ SUPABASE_SERVICE_ROLE_KEY
 
 Without these, production would fall back to browser storage (not suitable for a live bar).
 
-### D3. Deploy
+### D3. Seed menu on live server
+
+After deploy, sync your full menu catalog (same as local) to Supabase:
+
+1. Log in on the **live site** as super admin
+2. **Admin → Inventory** → click **Sync to Live**
+
+Or run the SQL seed files in Supabase — see `MENU_SYNC.md`.
+
+### D4. Deploy
 Click **Deploy** → open `https://your-app.vercel.app`
 
 ### D4. Login on production

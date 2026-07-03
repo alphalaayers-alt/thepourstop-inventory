@@ -25,16 +25,33 @@ function saveCategories(categories: Category[]): void {
 
 export function initializeCategories(): Category[] {
   const existing = getCategories();
-  if (existing.length > 0) return existing;
-
   const now = new Date().toISOString();
-  const categories: Category[] = DEFAULT_CATEGORIES.map((c) => ({
-    id: generateId(),
-    name: c.name,
-    slug: c.slug,
-    createdAt: now,
-  }));
+  const existingSlugs = new Set(existing.map((c) => c.slug));
+  const missing = DEFAULT_CATEGORIES.filter((c) => !existingSlugs.has(c.slug)).map(
+    (c) => ({
+      id: generateId(),
+      name: c.name,
+      slug: c.slug,
+      createdAt: now,
+    })
+  );
 
+  if (missing.length === 0) {
+    return existing.length > 0
+      ? existing
+      : (() => {
+          const categories = DEFAULT_CATEGORIES.map((c) => ({
+            id: generateId(),
+            name: c.name,
+            slug: c.slug,
+            createdAt: now,
+          }));
+          saveCategories(categories);
+          return categories;
+        })();
+  }
+
+  const categories = [...existing, ...missing];
   saveCategories(categories);
   return categories;
 }

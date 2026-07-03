@@ -124,6 +124,8 @@ insert into public.categories (name, slug) values
   ('Beer', 'beer'),
   ('Cocktails', 'cocktail'),
   ('Whisky', 'whisky'),
+  ('Premium Whisky', 'premium_whisky'),
+  ('Single Malt', 'single_malt'),
   ('Vodka', 'vodka'),
   ('Rum', 'rum'),
   ('Gin', 'gin'),

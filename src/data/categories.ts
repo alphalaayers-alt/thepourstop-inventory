@@ -10,6 +10,8 @@ export const DEFAULT_CATEGORIES: { name: string; slug: string }[] = [
   { name: "Beer", slug: "beer" },
   { name: "Cocktails", slug: "cocktail" },
   { name: "Whisky", slug: "whisky" },
+  { name: "Premium Whisky", slug: "premium_whisky" },
+  { name: "Single Malt", slug: "single_malt" },
   { name: "Vodka", slug: "vodka" },
   { name: "Rum", slug: "rum" },
   { name: "Gin", slug: "gin" },

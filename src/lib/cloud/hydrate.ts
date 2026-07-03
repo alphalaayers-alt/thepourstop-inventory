@@ -75,4 +75,7 @@ export async function hydrateCloudStore(supabase: SupabaseClient): Promise<void>
   cloudSetItem(storageKeys.dataVersion, 3);
 
   setCloudHydrated(true);
+
+  const { seedDefaultMenuItems } = await import("../catalog");
+  seedDefaultMenuItems();
 }

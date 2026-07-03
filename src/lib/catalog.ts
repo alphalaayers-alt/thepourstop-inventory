@@ -23,6 +23,13 @@ import {
   normalizePourSizes,
   sanitizePourSizes,
 } from "./pour-sizes";
+import {
+  SPIRIT_MENU_SEED,
+  buildPourSizesFromSeed,
+} from "@/data/spirit-menu-seed";
+import { SOFT_BEVERAGE_MENU_SEED } from "@/data/soft-beverage-menu-seed";
+import { BEER_MENU_SEED } from "@/data/beer-menu-seed";
+import type { BottleMenuSeed } from "@/data/soft-beverage-menu-seed";
 
 const DATA_VERSION = 3;
 
@@ -439,6 +446,182 @@ function seedPourSizes(basePrice30ml: number): PourSizePrice[] {
   return [{ ml: 30, price: basePrice30ml, pours: 1 }];
 }
 
+function menuItemNameKey(name: string): string {
+  return name.trim().toLowerCase();
+}
+
+/** Idempotent — adds spirit menu items with 0 stock and full combo pricing. */
+export function seedSpiritMenuItems(): void {
+  const menu = getMenu();
+  const stock = getStockEntries();
+  const stockByMenuId = new Map(stock.map((entry) => [entry.menuItemId, entry]));
+  const now = new Date().toISOString();
+  let menuChanged = false;
+  let stockChanged = false;
+  const updatedMenu = [...menu];
+  const updatedStock = [...stock];
+
+  for (const seed of SPIRIT_MENU_SEED) {
+    const pourSizes = normalizePourSizes(buildPourSizesFromSeed(seed));
+    const primary = getPrimaryPourOption(pourSizes);
+    const nameKey = menuItemNameKey(seed.name);
+
+    const existingIndex = updatedMenu.findIndex(
+      (item) => item.isActive && menuItemNameKey(item.name) === nameKey
+    );
+
+    if (existingIndex >= 0) {
+      const existing = updatedMenu[existingIndex];
+      const next: MenuItem = {
+        ...existing,
+        category: seed.category,
+        unitType: "pour",
+        pourSizes,
+        servingSizeMl: 30,
+        sellPrice: primary.price,
+        bottleSizeMl: existing.bottleSizeMl ?? 750,
+      };
+
+      if (JSON.stringify(next) !== JSON.stringify(existing)) {
+        updatedMenu[existingIndex] = next;
+        menuChanged = true;
+      }
+
+      if (!stockByMenuId.has(existing.id)) {
+        updatedStock.push({
+          menuItemId: existing.id,
+          stockQuantity: 0,
+          purchasePrice: 0,
+          lowStockThreshold: 150,
+          updatedAt: now,
+        });
+        stockChanged = true;
+      }
+      continue;
+    }
+
+    const id = generateId();
+    const menuItem: MenuItem = {
+      id,
+      name: seed.name,
+      category: seed.category,
+      unitType: "pour",
+      sellPrice: primary.price,
+      servingSizeMl: 30,
+      pourSizes,
+      bottleSizeMl: 750,
+      isActive: true,
+      createdAt: now,
+    };
+
+    updatedMenu.push(menuItem);
+    updatedStock.push({
+      menuItemId: id,
+      stockQuantity: 0,
+      purchasePrice: 0,
+      lowStockThreshold: 150,
+      updatedAt: now,
+    });
+    menuChanged = true;
+    stockChanged = true;
+  }
+
+  if (menuChanged) saveMenu(updatedMenu);
+  if (stockChanged) saveStock(updatedStock);
+}
+
+/** Idempotent — adds bottle-priced menu items with 0 stock (no peg pricing). */
+function seedBottleMenuItems(seeds: BottleMenuSeed[]): void {
+  const menu = getMenu();
+  const stock = getStockEntries();
+  const stockByMenuId = new Map(stock.map((entry) => [entry.menuItemId, entry]));
+  const now = new Date().toISOString();
+  let menuChanged = false;
+  let stockChanged = false;
+  const updatedMenu = [...menu];
+  const updatedStock = [...stock];
+
+  for (const seed of seeds) {
+    const nameKey = menuItemNameKey(seed.name);
+
+    const existingIndex = updatedMenu.findIndex(
+      (item) => item.isActive && menuItemNameKey(item.name) === nameKey
+    );
+
+    if (existingIndex >= 0) {
+      const existing = updatedMenu[existingIndex];
+      const next: MenuItem = {
+        ...existing,
+        category: seed.category,
+        unitType: "bottle",
+        sellPrice: seed.sellPrice,
+        servingSizeMl: 1,
+        pourSizes: undefined,
+        bottleSizeMl: undefined,
+      };
+
+      if (JSON.stringify(next) !== JSON.stringify(existing)) {
+        updatedMenu[existingIndex] = next;
+        menuChanged = true;
+      }
+
+      if (!stockByMenuId.has(existing.id)) {
+        updatedStock.push({
+          menuItemId: existing.id,
+          stockQuantity: 0,
+          purchasePrice: 0,
+          lowStockThreshold: 5,
+          updatedAt: now,
+        });
+        stockChanged = true;
+      }
+      continue;
+    }
+
+    const id = generateId();
+    const menuItem: MenuItem = {
+      id,
+      name: seed.name,
+      category: seed.category,
+      unitType: "bottle",
+      sellPrice: seed.sellPrice,
+      servingSizeMl: 1,
+      isActive: true,
+      createdAt: now,
+    };
+
+    updatedMenu.push(menuItem);
+    updatedStock.push({
+      menuItemId: id,
+      stockQuantity: 0,
+      purchasePrice: 0,
+      lowStockThreshold: 5,
+      updatedAt: now,
+    });
+    menuChanged = true;
+    stockChanged = true;
+  }
+
+  if (menuChanged) saveMenu(updatedMenu);
+  if (stockChanged) saveStock(updatedStock);
+}
+
+export function seedSoftBeverageMenuItems(): void {
+  seedBottleMenuItems(SOFT_BEVERAGE_MENU_SEED);
+}
+
+export function seedBeerMenuItems(): void {
+  seedBottleMenuItems(BEER_MENU_SEED);
+}
+
+/** Seed all default menu items (spirits + soft beverages). */
+export function seedDefaultMenuItems(): void {
+  initializeCategories();
+  seedSpiritMenuItems();
+  seedBeerMenuItems();
+  seedSoftBeverageMenuItems();
+}
+
 /** Returns saved menu — no demo seed; manager adds items via Inventory. */
 export function initializeMenu(): MenuItem[] {
   return getMenu();
@@ -495,6 +678,7 @@ export function initializeAppData(): void {
     migratePourSizeCombos();
   }
 
+  seedDefaultMenuItems();
   initializeMenu();
   if (!useCloudDatabase()) {
     initializeCategories();

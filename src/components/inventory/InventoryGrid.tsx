@@ -43,6 +43,7 @@ function statusBadge(item: InventoryItem) {
 }
 
 import { StatCard } from "@/components/ui/StatCard";
+import { MenuCatalogSyncButton } from "@/components/inventory/MenuCatalogSyncButton";
 
 interface InventoryGridProps {
   /** Super admin always has full access */
@@ -235,31 +236,37 @@ export function InventoryGrid({ fullAccess = false }: InventoryGridProps) {
       </div>
 
       {/* Toolbar */}
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex flex-col gap-3 p-4 lg:flex-row lg:items-center lg:justify-between lg:gap-4">
-          <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-            {canAddStock && (
-              <Button
-                size="sm"
-                variant={showAddStockModal ? "primary" : "secondary"}
-                onClick={() => setShowAddStockModal(true)}
-              >
-                + Add Stock
-              </Button>
-            )}
-            {canAddItem && (
-              <Button
-                size="sm"
-                variant={showAddModal ? "primary" : "secondary"}
-                onClick={() => setShowAddModal(true)}
-              >
-                + New Item
-              </Button>
-            )}
-            {(canAddStock || canAddItem) && (canManageCategories || canDownloadReport || canViewStockHistory) && (
-              <span className="mx-1 h-5 w-px shrink-0 bg-slate-200" aria-hidden />
-            )}
-            {canManageCategories && (
+      <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm sm:px-5">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-x-3 sm:gap-y-2">
+          {(canAddStock || canAddItem) && (
+            <div className="flex shrink-0 items-center gap-1.5">
+              {canAddStock && (
+                <Button
+                  size="sm"
+                  variant={showAddStockModal ? "primary" : "secondary"}
+                  onClick={() => setShowAddStockModal(true)}
+                >
+                  + Add Stock
+                </Button>
+              )}
+              {canAddItem && (
+                <Button
+                  size="sm"
+                  variant={showAddModal ? "primary" : "secondary"}
+                  onClick={() => setShowAddModal(true)}
+                >
+                  + New Item
+                </Button>
+              )}
+              {fullAccess && <MenuCatalogSyncButton />}
+            </div>
+          )}
+
+          {canManageCategories && (
+            <>
+              {(canAddStock || canAddItem) && (
+                <span className="hidden h-6 w-px shrink-0 bg-slate-200 md:block" aria-hidden />
+              )}
               <Button
                 size="sm"
                 variant={showCategoryModal ? "primary" : "secondary"}
@@ -267,56 +274,67 @@ export function InventoryGrid({ fullAccess = false }: InventoryGridProps) {
               >
                 Categories
               </Button>
-            )}
-            <div className="relative shrink-0" ref={filterButtonRef}>
-              <Button
-                size="sm"
-                variant={activeFilterCount > 0 || filterMenuOpen ? "primary" : "secondary"}
-                onClick={toggleFilterMenu}
-                aria-expanded={filterMenuOpen}
-                aria-haspopup="true"
-              >
-                Filter
-                {activeFilterCount > 0 && (
-                  <span className="ml-1 rounded-full bg-emerald-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                    {activeFilterCount}
-                  </span>
-                )}
-                <svg
-                  className={`ml-1 h-3.5 w-3.5 transition-transform ${filterMenuOpen ? "rotate-180" : ""}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                  aria-hidden
+            </>
+          )}
+
+          {view === "items" && (
+            <div className="flex shrink-0 items-center gap-1.5">
+              <div className="relative" ref={filterButtonRef}>
+                <Button
+                  size="sm"
+                  variant={activeFilterCount > 0 || filterMenuOpen ? "primary" : "secondary"}
+                  onClick={toggleFilterMenu}
+                  aria-expanded={filterMenuOpen}
+                  aria-haspopup="true"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
-              </Button>
+                  Filter
+                  {activeFilterCount > 0 && (
+                    <span className="ml-1 rounded-full bg-emerald-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                      {activeFilterCount}
+                    </span>
+                  )}
+                  <svg
+                    className={`ml-1 h-3.5 w-3.5 transition-transform ${filterMenuOpen ? "rotate-180" : ""}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                    aria-hidden
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </Button>
+              </div>
+              {activeFilterCount > 0 && (
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="shrink-0 px-2 text-xs font-medium text-slate-500 hover:text-slate-800"
+                >
+                  Clear
+                </button>
+              )}
             </div>
-            {activeFilterCount > 0 && (
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="shrink-0 px-2 text-xs font-medium text-slate-500 hover:text-slate-800"
-              >
-                Clear
-              </button>
-            )}
-            {(canManageCategories || canDownloadReport || canViewStockHistory) && (
-              <span className="mx-1 h-5 w-px shrink-0 bg-slate-200" aria-hidden />
-            )}
-            {canDownloadReport && (
+          )}
+
+          {canDownloadReport && (
+            <>
+              <span className="hidden h-6 w-px shrink-0 bg-slate-200 md:block" aria-hidden />
               <Button
                 size="sm"
                 variant={showStockReportModal ? "primary" : "secondary"}
                 onClick={() => setShowStockReportModal(true)}
               >
-                Download Stock Report
+                <span className="hidden lg:inline">Download Stock Report</span>
+                <span className="lg:hidden">Report</span>
               </Button>
-            )}
-            {canViewStockHistory && (
-              <>
+            </>
+          )}
+
+          {canViewStockHistory && (
+            <>
+              <span className="hidden h-6 w-px shrink-0 bg-slate-200 md:block" aria-hidden />
+              <div className="flex shrink-0 items-center gap-1.5">
                 <Button
                   size="sm"
                   variant={view === "stock_added" ? "primary" : "secondary"}
@@ -331,34 +349,37 @@ export function InventoryGrid({ fullAccess = false }: InventoryGridProps) {
                 >
                   In Stack
                 </Button>
-              </>
-            )}
-          </div>
+              </div>
+            </>
+          )}
 
           {view === "items" && (
-            <div className="relative w-full shrink-0 lg:w-72">
-              <svg
-                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-                aria-hidden
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"
+            <>
+              <span className="hidden h-6 w-px shrink-0 bg-slate-200 md:block" aria-hidden />
+              <div className="relative w-full min-w-[11rem] basis-full sm:basis-auto sm:w-56 md:w-64 lg:w-72">
+                <svg
+                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  aria-hidden
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"
+                  />
+                </svg>
+                <input
+                  type="search"
+                  placeholder="Search items..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full rounded-lg border border-slate-200 bg-slate-50/50 py-2 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors outline-none focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-100"
                 />
-              </svg>
-              <input
-                type="search"
-                placeholder="Search items..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-slate-50/50 py-2 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors outline-none focus:border-slate-300 focus:bg-white focus:outline-none"
-              />
-            </div>
+              </div>
+            </>
           )}
         </div>
       </div>
