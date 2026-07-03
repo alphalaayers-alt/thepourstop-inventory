@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8fafc;
+  --foreground: #0f172a;
 }
 
 @theme inline {
@@ -12,15 +12,92 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+button:not(:disabled),
+a[href],
+select,
+label[for],
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* SweetAlert — Pour Stop theme */
+.pourstop-toast {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px -5px rgb(15 23 42 / 0.12) !important;
+  padding: 0.85rem 1rem !important;
+}
+
+.pourstop-toast-title {
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  color: #0f172a !important;
+}
+
+.pourstop-toast-text {
+  font-size: 0.8rem !important;
+  color: #64748b !important;
+}
+
+.pourstop-toast-progress {
+  background: #059669 !important;
+}
+
+.pourstop-alert {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 40px -12px rgb(15 23 42 / 0.2) !important;
+}
+
+.pourstop-alert-title {
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+  color: #0f172a !important;
+}
+
+.pourstop-alert-text {
+  font-size: 0.875rem !important;
+  color: #64748b !important;
+}
+
+.pourstop-alert-confirm {
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  padding: 0.5rem 1.25rem !important;
+}
+
+.pourstop-alert-cancel {
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  padding: 0.5rem 1.25rem !important;
+}
+
+button:focus,
+button:focus-visible,
+[role="button"]:focus,
+[role="button"]:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Hide spinner arrows on any native number inputs */
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
