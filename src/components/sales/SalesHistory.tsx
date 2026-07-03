@@ -32,6 +32,19 @@ function formatSaleDateTime(iso: string): string {
   return `${date}, ${time}`;
 }
 
+function getPaymentLabel(order: Order) {
+  return order.paymentMethod
+    ? formatPaymentDetail(
+        {
+          method: order.paymentMethod,
+          cashAmount: order.paymentCashAmount ?? 0,
+          onlineAmount: order.paymentOnlineAmount ?? 0,
+        },
+        formatMoney
+      )
+    : "—";
+}
+
 export function SalesHistory({
   orders: propOrders,
   title = "Sales",
@@ -96,7 +109,78 @@ export function SalesHistory({
           description={description ?? `${orders.length} sale(s)`}
           action={headerAction}
         />
-        <div className="overflow-x-auto">
+        <div className="divide-y divide-slate-100 lg:hidden">
+          {orders.map((order) => {
+            const completedAt = order.completedAt ?? order.createdAt;
+            const itemsPreview = formatOrderItemsPreview(order);
+            const paymentLabel = getPaymentLabel(order);
+            const customerLabel = order.tableNumber
+              ? `Table ${order.tableNumber}`
+              : order.customerName;
+
+            return (
+              <div key={order.id} className="px-4 py-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-slate-900">{customerLabel}</p>
+                    <p className="mt-0.5 text-xs tabular-nums text-slate-500">
+                      {formatSaleDateTime(completedAt)}
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    {order.discountAmount != null && order.discountAmount > 0 ? (
+                      <>
+                        <p className="text-xs tabular-nums text-slate-400 line-through">
+                          {formatMoney(order.subtotal)}
+                        </p>
+                        <p className="text-sm font-semibold tabular-nums text-emerald-700">
+                          {formatMoney(order.total)}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-sm font-semibold tabular-nums text-emerald-700">
+                        {formatMoney(order.total)}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <p className="mt-2 line-clamp-2 text-sm text-slate-600">{itemsPreview}</p>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <Badge variant={order.type === "table" ? "info" : "neutral"}>
+                    {order.type === "table" ? "Table" : "Walk-in"}
+                  </Badge>
+                  <span className="text-xs text-slate-500">
+                    {order.items.length} line{order.items.length !== 1 ? "s" : ""} · {order.managerName}
+                  </span>
+                </div>
+                <p className="mt-2 text-xs text-slate-500">{paymentLabel}</p>
+                <div className="mt-3 flex gap-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => setDetailOrder(order)}
+                  >
+                    View
+                  </Button>
+                  {allowDelete && (
+                    <Button
+                      type="button"
+                      variant="danger"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => handleDelete(order)}
+                    >
+                      Delete
+                    </Button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="hidden overflow-x-auto lg:block">
           <table className="w-full min-w-[1120px] table-fixed">
             <colgroup>
               <col className="w-[11.5rem]" />
@@ -126,16 +210,7 @@ export function SalesHistory({
               {orders.map((order) => {
                 const completedAt = order.completedAt ?? order.createdAt;
                 const itemsPreview = formatOrderItemsPreview(order);
-                const paymentLabel = order.paymentMethod
-                  ? formatPaymentDetail(
-                      {
-                        method: order.paymentMethod,
-                        cashAmount: order.paymentCashAmount ?? 0,
-                        onlineAmount: order.paymentOnlineAmount ?? 0,
-                      },
-                      formatMoney
-                    )
-                  : "—";
+                const paymentLabel = getPaymentLabel(order);
 
                 return (
                   <tr

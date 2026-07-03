@@ -4,57 +4,62 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import type { ManagerPermissions } from "@/types/auth";
+import { managerNavItems, managerNavPermissions } from "./manager-nav";
 
-const navItems: {
-  label: string;
-  href: string;
-  permission: keyof ManagerPermissions;
-}[] = [
-  { label: "Dashboard", href: "/manager", permission: "viewDashboard" },
-  { label: "Inventory", href: "/manager/inventory", permission: "viewInventory" },
-  { label: "Tables", href: "/manager/tables", permission: "manageTables" },
-  { label: "Quick Billing", href: "/manager/billing", permission: "walkInBilling" },
-  { label: "Sales", href: "/manager/sales", permission: "viewSales" },
-];
+interface ManagerSidebarProps {
+  onNavigate?: () => void;
+}
 
-export function ManagerSidebar() {
+const sidebarLabels: Record<string, string> = {
+  "/manager": "Dashboard",
+  "/manager/inventory": "Inventory",
+  "/manager/tables": "Tables",
+  "/manager/billing": "Quick Billing",
+  "/manager/sales": "Sales",
+};
+
+export function ManagerSidebar({ onNavigate }: ManagerSidebarProps) {
   const pathname = usePathname();
   const { session, logout, hasPermission } = useAuth();
 
-  const visibleItems = navItems.filter((item) => hasPermission(item.permission));
+  const visibleItems = managerNavItems.filter((item) => {
+    const perm = managerNavPermissions[item.href];
+    return perm ? hasPermission(perm) : true;
+  });
 
   return (
-    <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col border-r border-slate-200 bg-white">
-      <div className="border-b border-slate-100 px-6 py-5">
+    <aside className="flex h-full flex-col border-r border-slate-200 bg-white">
+      <div className="border-b border-slate-100 px-4 py-4 sm:px-6 sm:py-5">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-700 text-sm font-bold text-white">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-700 text-sm font-bold text-white">
             PS
           </div>
-          <div>
-            <p className="text-sm font-semibold text-slate-900">The Pour Stop</p>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-slate-900">The Pour Stop</p>
             <p className="text-xs text-slate-500">Manager</p>
           </div>
         </div>
       </div>
 
-      <nav className="flex-1 space-y-1 px-3 py-4">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
         {visibleItems.map((item) => {
-          const isActive =
-            item.href === "/manager"
-              ? pathname === "/manager"
-              : pathname.startsWith(item.href);
+          const isActive = item.match
+            ? item.match(pathname, item.href)
+            : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+              onClick={onNavigate}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                 isActive
                   ? "bg-emerald-700 text-white"
                   : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
-              {item.label}
+              {item.icon}
+              {sidebarLabels[item.href] ?? item.label}
             </Link>
           );
         })}
@@ -71,12 +76,25 @@ export function ManagerSidebar() {
           <p className="truncate text-xs text-slate-500">{session?.email}</p>
         </div>
         <button
-          onClick={logout}
-          className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-600 hover:bg-slate-50"
+          type="button"
+          onClick={() => {
+            logout();
+            onNavigate?.();
+          }}
+          className="w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-50"
         >
           Sign out
         </button>
       </div>
     </aside>
   );
+}
+
+export function getManagerBottomNavItems(
+  hasPermission: (permission: keyof ManagerPermissions) => boolean
+) {
+  return managerNavItems.filter((item) => {
+    const perm = managerNavPermissions[item.href];
+    return perm ? hasPermission(perm) : true;
+  });
 }

@@ -38,19 +38,20 @@ export function SalesRangeFilter({
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-end gap-2">
+    <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
       {showDownload && (
         <Button
           type="button"
           size="sm"
           variant="secondary"
+          className="w-full sm:w-auto"
           onClick={handleDownloadReport}
         >
           {downloadLabel}
         </Button>
       )}
 
-      <div className="flex rounded-lg border border-slate-200 bg-slate-50 p-0.5">
+      <div className="flex w-full rounded-lg border border-slate-200 bg-slate-50 p-0.5 sm:w-auto">
         <Button
           type="button"
           size="sm"
@@ -83,7 +84,7 @@ export function SalesRangeFilter({
       </div>
 
       <label
-        className={`flex items-center gap-2 rounded-lg border bg-white px-3 py-1.5 text-sm transition-colors ${
+        className={`flex w-full items-center gap-2 rounded-lg border bg-white px-3 py-1.5 text-sm transition-colors sm:w-auto ${
           range === "date"
             ? "border-slate-900 ring-2 ring-slate-200"
             : "border-slate-200"

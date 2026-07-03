@@ -16,9 +16,9 @@ const accents = {
 
 export function StatCard({ label, value, subtext, accent = "default" }: StatCardProps) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p className="text-sm font-medium text-slate-500">{label}</p>
-      <p className={`mt-2 text-2xl font-semibold ${accents[accent]}`}>
+    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+      <p className="text-xs font-medium text-slate-500 sm:text-sm">{label}</p>
+      <p className={`mt-1.5 text-xl font-semibold sm:mt-2 sm:text-2xl ${accents[accent]}`}>
         {typeof value === "number" ? formatMoney(value) : value}
       </p>
       {subtext && <p className="mt-1 text-xs text-slate-400">{subtext}</p>}

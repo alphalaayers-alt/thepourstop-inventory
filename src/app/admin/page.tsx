@@ -38,8 +38,8 @@ export default function AdminDashboardPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-slate-900">Overview</h1>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">Overview</h1>
         <p className="mt-1 text-sm text-slate-500">
           Complete business overview — sales, stock & all-time data
         </p>
@@ -116,8 +116,8 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="mb-8">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">Today&apos;s Sales</h2>
+        <div className="mb-4 flex flex-col gap-3 sm:mb-4 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="text-base font-semibold text-slate-900 sm:text-lg">Today&apos;s Sales</h2>
           <Link href="/admin/sales">
             <Button variant="secondary" size="sm">View All Sales</Button>
           </Link>

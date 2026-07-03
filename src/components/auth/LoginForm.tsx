@@ -32,7 +32,7 @@ export function LoginForm() {
 
   return (
     <Card className="w-full max-w-md">
-      <CardContent className="py-8">
+      <CardContent className="py-6 sm:py-8">
         <form onSubmit={handleSubmit} className="space-y-5">
           <Input
             label="Email"

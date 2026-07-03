@@ -35,9 +35,9 @@ export default function ManagerDashboardPage() {
 
   return (
     <div>
-      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+      <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Manager Dashboard</h1>
+          <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">Manager Dashboard</h1>
           <p className="mt-1 text-sm text-slate-500">
             Today&apos;s overview — sales, stock & customers
           </p>
@@ -69,7 +69,7 @@ export default function ManagerDashboardPage() {
 
       <div className="mb-8 grid gap-6 lg:grid-cols-2">
         <SalesChart data={weekSales} title="Last 7 Days Sales" />
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
           <h3 className="mb-4 text-sm font-semibold text-slate-900">Last 3 Months</h3>
           <p className="text-3xl font-bold text-emerald-700">{formatMoney(threeMonthTotal)}</p>
           <p className="mt-1 text-sm text-slate-500">Total revenue</p>

@@ -137,7 +137,7 @@ export function ActivityHistory({ limit = 30 }: { limit?: number }) {
         {activities.map((act) => {
           const meta = activityMeta(act.type);
           return (
-            <div key={act.id} className="flex items-start gap-4 px-6 py-4">
+            <div key={act.id} className="flex items-start gap-3 px-4 py-4 sm:gap-4 sm:px-6">
               <div
                 className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ${meta.iconClass}`}
               >

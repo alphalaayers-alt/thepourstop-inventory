@@ -27,14 +27,14 @@ export default function EditManagerPage() {
 
   return (
     <div>
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <Link
           href="/admin/managers"
           className="mb-3 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800"
         >
           ← Back to managers
         </Link>
-        <h1 className="text-2xl font-semibold text-slate-900">Edit Manager</h1>
+        <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">Edit Manager</h1>
         <p className="mt-1 text-sm text-slate-500">
           Update account details and control what {manager.name} can access.
         </p>

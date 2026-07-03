@@ -35,15 +35,15 @@ export function SaleDetailModal({ order, onClose }: SaleDetailModalProps) {
     : order.customerName;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
       <button
         type="button"
         className="absolute inset-0 bg-slate-900/45 backdrop-blur-sm"
         onClick={onClose}
         aria-label="Close"
       />
-      <div className="relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
-        <div className="shrink-0 border-b border-slate-100 px-6 py-5">
+      <div className="relative flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl border border-slate-200 bg-white shadow-2xl sm:max-h-[90vh] sm:rounded-2xl">
+        <div className="shrink-0 border-b border-slate-100 px-4 py-4 sm:px-6 sm:py-5">
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="flex flex-wrap items-center gap-2">
@@ -67,7 +67,7 @@ export function SaleDetailModal({ order, onClose }: SaleDetailModalProps) {
           </div>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">
           <section>
             <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               Order items
@@ -148,7 +148,7 @@ export function SaleDetailModal({ order, onClose }: SaleDetailModalProps) {
           )}
         </div>
 
-        <div className="shrink-0 border-t border-slate-100 bg-slate-50/80 px-6 py-4">
+        <div className="shrink-0 border-t border-slate-100 bg-slate-50/80 px-4 py-4 sm:px-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="space-y-1 text-sm">
               {order.discountAmount != null && order.discountAmount > 0 && (

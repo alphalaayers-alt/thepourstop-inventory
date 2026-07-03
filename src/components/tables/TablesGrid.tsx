@@ -139,9 +139,9 @@ export function TablesGrid() {
 
   return (
     <>
-      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-        <h1 className="text-2xl font-semibold text-slate-900">Tables</h1>
-        <Button onClick={handleAddTable}>+ Add new table</Button>
+      <div className="mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+        <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">Tables</h1>
+        <Button onClick={handleAddTable} className="w-full sm:w-auto">+ Add new table</Button>
       </div>
 
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -169,7 +169,7 @@ export function TablesGrid() {
         />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {tables.map((table) => {
           const activeOrder = getActiveOrderForTable(table.id);
           const isRunning = table.status === "running" || !!activeOrder;
@@ -179,7 +179,7 @@ export function TablesGrid() {
           return (
             <Card
               key={table.id}
-              className={`relative flex h-[220px] min-h-[220px] flex-col overflow-hidden transition-all hover:shadow-md ${
+              className={`relative flex h-[200px] min-h-[200px] flex-col overflow-hidden transition-all hover:shadow-md sm:h-[220px] sm:min-h-[220px] ${
                 isRunning
                   ? "border-amber-200 bg-gradient-to-b from-amber-50/90 to-white"
                   : "hover:border-slate-300"

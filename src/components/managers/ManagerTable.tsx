@@ -102,7 +102,54 @@ export function ManagersTable() {
           </Link>
         }
       />
-      <div className="overflow-x-auto">
+      <div className="divide-y divide-slate-100 lg:hidden">
+        {managers.map((manager) => (
+          <div key={manager.id} className="px-4 py-4">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-600">
+                {manager.name.charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-sm font-semibold text-slate-900">{manager.name}</p>
+                  <Badge variant={manager.isActive ? "success" : "warning"}>
+                    {manager.isActive ? "Active" : "Inactive"}
+                  </Badge>
+                </div>
+                <p className="mt-0.5 truncate text-sm text-slate-600">{manager.email}</p>
+                <p className="mt-2 text-xs text-slate-500">
+                  {countEnabledPermissions(normalizeManagerPermissions(manager.permissions))} permissions · Created{" "}
+                  {formatDate(manager.createdAt)}
+                </p>
+              </div>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link href={`/admin/managers/${manager.id}/edit`} className="flex-1 sm:flex-none">
+                <Button variant="secondary" size="sm" className="w-full">
+                  Edit
+                </Button>
+              </Link>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="flex-1 sm:flex-none"
+                onClick={() => handleToggle(manager.id, manager.name, manager.isActive)}
+              >
+                {manager.isActive ? "Deactivate" : "Activate"}
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
+                className="flex-1 sm:flex-none"
+                onClick={() => handleDelete(manager.id, manager.name)}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="hidden overflow-x-auto lg:block">
         <table className="w-full">
           <thead>
             <tr className="border-b border-slate-100 text-left text-xs font-medium uppercase tracking-wider text-slate-500">

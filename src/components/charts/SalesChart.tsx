@@ -12,9 +12,9 @@ export function SalesChart({ data, title = "Sales" }: SalesChartProps) {
   const maxTotal = Math.max(...data.map((d) => d.total), 1);
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h3 className="mb-6 text-sm font-semibold text-slate-900">{title}</h3>
-      <div className="flex h-48 items-end gap-2">
+    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+      <h3 className="mb-4 text-sm font-semibold text-slate-900 sm:mb-6">{title}</h3>
+      <div className="flex h-36 items-end gap-1 sm:h-48 sm:gap-2">
         {data.map((day) => {
           const height = (day.total / maxTotal) * 100;
           const label = new Date(day.date).toLocaleDateString("en-IN", {

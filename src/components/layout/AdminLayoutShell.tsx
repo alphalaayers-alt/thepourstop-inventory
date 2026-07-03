@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { initializeTables } from "@/lib/tables";
 import { AdminSidebar } from "./AdminSidebar";
+import { ResponsiveShell } from "./ResponsiveShell";
+import { adminNavItems } from "./admin-nav";
 
 export function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   const { session, isLoading } = useAuth();
   const router = useRouter();
-
   useEffect(() => {
     initializeTables();
   }, []);
@@ -34,7 +35,7 @@ export function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+      <div className="flex min-h-[100dvh] items-center justify-center bg-slate-50">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-900" />
       </div>
     );
@@ -42,18 +43,21 @@ export function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   if (!session || session.role !== "super_admin") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+      <div className="flex min-h-[100dvh] items-center justify-center bg-slate-50">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-900" />
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
-      <AdminSidebar />
-      <main className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-6xl px-8 py-8">{children}</div>
-      </main>
-    </div>
+    <ResponsiveShell
+      mobileTitle="The Pour Stop"
+      mobileSubtitle="Super Admin"
+      accent="slate"
+      bottomNavItems={adminNavItems}
+      sidebar={({ onNavigate }) => <AdminSidebar onNavigate={onNavigate} />}
+    >
+      {children}
+    </ResponsiveShell>
   );
 }

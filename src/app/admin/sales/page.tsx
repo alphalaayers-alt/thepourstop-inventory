@@ -85,8 +85,8 @@ export default function AdminSalesPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-slate-900">All Sales</h1>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">All Sales</h1>
         <p className="mt-1 text-sm text-slate-500">
           Complete sales history, daily reports, and full admin control.
         </p>

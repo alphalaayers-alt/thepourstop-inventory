@@ -4,7 +4,7 @@ import { CreateManagerForm } from "@/components/managers/CreateManagerForm";
 export default function NewManagerPage() {
   return (
     <div>
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <Link
           href="/admin/managers"
           className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-slate-900"
@@ -14,7 +14,7 @@ export default function NewManagerPage() {
           </svg>
           Back to Managers
         </Link>
-        <h1 className="text-2xl font-semibold text-slate-900">Create Manager</h1>
+        <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">Create Manager</h1>
         <p className="mt-1 text-sm text-slate-500">
           Add a new manager account. They will be able to sign in with these credentials.
         </p>
